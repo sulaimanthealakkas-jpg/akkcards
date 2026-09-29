@@ -10,6 +10,9 @@ const wss = new WebSocket.Server({server});
 const players = new Map();
 const tradeLine = new Map();
 const waiting = [];
+const sessions = new Map();
+const matches = new Map();
+const cards = new Map();
 
 function send(ws,type,data={}) {
   if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({type,...data}));
@@ -36,12 +39,31 @@ wss.on("connection",(ws)=>{
     try { msg=JSON.parse(raw.toString()); } catch { return send(ws,"error",{message:"Invalid message"}); }
 
     if(msg.type==="identify"){
+      sessions.set(players.get(ws).id,{money:20000,inventory:[],wins:0});
+
       players.get(ws).name=safeName(msg.name);
       return send(ws,"identified",{name:players.get(ws).name});
     }
 
+    if(msg.type==="profile:state"){
+      const p=players.get(ws), state=sessions.get(p.id);
+      return send(ws,"profile:state",{state});
+    }
+
+    if(msg.type==="profile:save"){
+      const p=players.get(ws);
+      if(!sessions.has(p.id)) sessions.set(p.id,{money:20000,inventory:[],wins:0});
+      const incoming=msg.state||{};
+      const state=sessions.get(p.id);
+      state.money=Math.max(0,Number(incoming.money)||0);
+      state.inventory=Array.isArray(incoming.inventory)?incoming.inventory.slice(0,200):state.inventory;
+      state.wins=Math.max(0,Number(incoming.wins)||0);
+      return send(ws,"profile:saved",{state});
+    }
+
     if(msg.type==="trade:create"){
       const p=players.get(ws);
+      const ownerState=sessions.get(p.id);
       const listing={
         id:Math.random().toString(36).slice(2,10),
         ownerId:p.id, owner:p.name,
@@ -87,6 +109,8 @@ wss.on("connection",(ws)=>{
         const a=waiting.shift(), b=waiting.shift();
         if(!a || !b) return;
         const matchId=Math.random().toString(36).slice(2,10);
+        const match={id:matchId,players:[a,b],cards:new Map()};
+        matches.set(matchId,match);
         send(a,"battle:matched",{matchId,opponent:players.get(b)?.name||"Player"});
         send(b,"battle:matched",{matchId,opponent:players.get(a)?.name||"Player"});
       }
@@ -95,11 +119,23 @@ wss.on("connection",(ws)=>{
 
     if(msg.type==="battle:card"){
       const matchId=String(msg.matchId||"");
-      ws._battleCard={matchId,card:msg.card};
-      const other=[...wss.clients].find(c=>c!==ws && c._battleCard?.matchId===matchId);
-      if(other){
-        send(ws,"battle:ready",{matchId,opponentCard:other._battleCard.card});
-        send(other,"battle:ready",{matchId,opponentCard:ws._battleCard.card});
+      const match=matches.get(matchId);
+      if(!match) return send(ws,"error",{message:"Match not found."});
+      if(!match.players.includes(ws)) return send(ws,"error",{message:"You are not in this match."});
+      match.cards.set(ws,msg.card);
+      const other=match.players.find(c=>c!==ws);
+      if(other && match.cards.has(other)){
+        const a=match.cards.get(match.players[0]), b=match.cards.get(match.players[1]);
+        const rank={Common:1,Uncommon:2,Rare:3,Epic:4,Legendary:5,Mythic:6,Secret:7,OG:8};
+        const score=c=>((rank[c?.rarity]||1)+Math.random());
+        const winner=score(a)>=score(b)?match.players[0]:match.players[1];
+        const loser=winner===match.players[0]?match.players[1]:match.players[0];
+        const winnerState=sessions.get(players.get(winner).id);
+        winnerState.wins++;
+        winnerState.money+=2500;
+        send(match.players[0],"battle:result",{matchId,winner:players.get(winner).name,win:winner===match.players[0],reward:winner===match.players[0]?2500:0});
+        send(match.players[1],"battle:result",{matchId,winner:players.get(winner).name,win:winner===match.players[1],reward:winner===match.players[1]?2500:0});
+        matches.delete(matchId);
       }
       return;
     }
@@ -110,6 +146,7 @@ wss.on("connection",(ws)=>{
   ws.on("close",()=>{
     removeFromQueue(ws);
     const p=players.get(ws);
+    sessions.delete(p?.id);
     players.delete(ws);
     broadcast("presence",{players:wss.clients.size});
   });
