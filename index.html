@@ -101,7 +101,7 @@ setTimeout(()=>{if(my>=opp){state.wins++;state.money+=2500;document.getElementBy
 
 // ===== AkkCards real-time WebSocket client =====
 const wsParam=new URLSearchParams(location.search).get("ws");
-const AKK_WS_URL=window.AKK_WS_URL||wsParam||(location.protocol==="https:"?"wss://"+location.host:"ws://"+location.host);
+const AKK_WS_URL=window.AKK_WS_URL||wsParam||"wss://akkcards-server.onrender.com";
 let socket=null, socketReady=false, reconnectTimer=null;
 function wsSend(type,data={}){if(socket&&socket.readyState===WebSocket.OPEN)socket.send(JSON.stringify({type,...data}));}
 function connectAkkWS(){
