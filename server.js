@@ -1,10 +1,26 @@
 const http = require("http");
+const fs = require("fs");
+const path = require("path");
 const WebSocket = require("ws");
 
 const PORT = process.env.PORT || 8080;
 const server = http.createServer((req,res)=>{
-  res.writeHead(200, {"Content-Type":"application/json"});
-  res.end(JSON.stringify({ok:true,service:"AkkCards WebSocket",players:wss.clients.size}));
+  if (req.url === "/health") {
+    res.writeHead(200, {"Content-Type":"application/json","Cache-Control":"no-store"});
+    return res.end(JSON.stringify({ok:true,service:"AkkCards",websocket:true,players:wss.clients.size}));
+  }
+  if (req.url === "/" || req.url.startsWith("/index.html")) {
+    try {
+      const html = fs.readFileSync(path.join(__dirname,"index.html"),"utf8");
+      res.writeHead(200, {"Content-Type":"text/html; charset=utf-8","Cache-Control":"no-store"});
+      return res.end(html);
+    } catch (err) {
+      res.writeHead(500, {"Content-Type":"text/plain"});
+      return res.end("AkkCards frontend unavailable");
+    }
+  }
+  res.writeHead(404, {"Content-Type":"application/json"});
+  res.end(JSON.stringify({ok:false,error:"Not found"}));
 });
 const wss = new WebSocket.Server({server});
 const players = new Map();
