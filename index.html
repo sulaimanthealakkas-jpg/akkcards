@@ -98,6 +98,84 @@ document.getElementById("enemyArt").textContent=enemy.emoji;document.getElementB
 const my=rarityRank[c.rarity]+Math.random(), opp=rarityRank[enemy.rarity]+Math.random();
 setTimeout(()=>{if(my>=opp){state.wins++;state.money+=2500;document.getElementById("battleLog").textContent="YOU WIN! +💰2,500 · Win #"+state.wins}else{document.getElementById("battleLog").textContent="You lost this match. Your card stays in your collection."}save()},500);
 };
+
+// ===== AkkCards real-time WebSocket client =====
+const wsParam=new URLSearchParams(location.search).get("ws");
+const AKK_WS_URL=window.AKK_WS_URL||wsParam||(location.protocol==="https:"?"wss://"+location.host:"ws://"+location.host);
+let socket=null, socketReady=false, reconnectTimer=null;
+function wsSend(type,data={}){if(socket&&socket.readyState===WebSocket.OPEN)socket.send(JSON.stringify({type,...data}));}
+function connectAkkWS(){
+  try{
+    socket=new WebSocket(AKK_WS_URL);
+    socket.onopen=()=>{
+      socketReady=true;
+      wsSend("identify",{name:"AkkPlayer"});
+      toast("🟢 Live server connected");
+    };
+    socket.onmessage=(e)=>{
+      let m;try{m=JSON.parse(e.data)}catch{return}
+      if(m.type==="presence"){
+        const el=document.getElementById("online");
+        if(el)el.textContent=m.players.toLocaleString()+" players online";
+      }
+      if(m.type==="trade:created"){
+        if(!state.trades.some(t=>t.id===m.listing.id)){
+          state.trades.push(m.listing);save();
+          toast("🤝 New trade listing: "+m.listing.card.name);
+        }
+      }
+      if(m.type==="trade:removed"){
+        state.trades=state.trades.filter(t=>t.id!==m.listingId);save();
+      }
+      if(m.type==="trade:offer")toast("📨 "+m.from+" sent an offer for "+m.listing.card.name);
+      if(m.type==="trade:offerSent")toast("📨 Offer sent — waiting for the owner");
+      if(m.type==="trade:response")toast(m.accepted?"✅ Trade accepted!":"❌ Trade declined.");
+      if(m.type==="battle:matched"){
+        document.getElementById("enemyName").textContent=m.opponent;
+        document.getElementById("battleLog").textContent="🟢 Matched with "+m.opponent+". Choose your card.";
+      }
+      if(m.type==="battle:ready"){
+        const oc=m.opponentCard||{};
+        document.getElementById("enemyArt").textContent=oc.emoji||"🃏";
+        document.getElementById("enemyName").textContent=oc.name||"Opponent";
+        document.getElementById("battleLog").textContent="⚔️ Both players locked in. Battle result can now be resolved by the server.";
+      }
+    };
+    socket.onclose=()=>{
+      socketReady=false;
+      if(reconnectTimer)return;
+      reconnectTimer=setTimeout(()=>{reconnectTimer=null;connectAkkWS()},4000);
+    };
+    socket.onerror=()=>{socketReady=false};
+  }catch{socketReady=false}
+}
+const oldPostTrade=document.getElementById("postTrade").onclick;
+document.getElementById("postTrade").onclick=()=>{
+  if(!state.inv.length){toast("You need a card first.");return}
+  const i=+document.getElementById("tradeCard").value;
+  const card=state.inv[i];
+  const want=document.getElementById("tradeOffer").value.trim()||"Open to offers";
+  if(socketReady){
+    wsSend("trade:create",{card,want});
+    toast("🌐 Trade posted to the live Trade Line");
+  }else{
+    state.trades.push({id:"local-"+Date.now(),card,owner:"You",want});save();
+    toast("Trade saved locally — server offline");
+  }
+  document.getElementById("tradeOffer").value="";
+};
+document.getElementById("findBattle").onclick=()=>{
+  if(!state.inv.length){toast("Get a card before battling.");return}
+  if(socketReady){
+    wsSend("battle:queue",{});
+    document.getElementById("battleLog").textContent="🔎 Searching for a real player...";
+    toast("⚔️ Matchmaking started");
+  }else{
+    toast("Live server offline — local battle unavailable");
+  }
+};
+connectAkkWS();
+
 render();
 </script>
 </body>
