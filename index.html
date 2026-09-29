@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AkkCards</title>
+<style>
+:root{--bg:#090a10;--panel:#121522;--panel2:#181c2b;--text:#f5f7ff;--muted:#9299ad;--line:#292e40;--gold:#ffd34d;--red:#ff5b6e;--green:#53e08b;--blue:#66a6ff}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% -10%,#20253b 0,#090a10 45%);color:var(--text);font-family:Inter,system-ui,Arial,sans-serif}button,input{font:inherit}button{cursor:pointer;border:0}.app{max-width:1100px;margin:auto;padding:18px 14px 92px}.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}.brand{font-size:25px;font-weight:900;letter-spacing:-1px}.brand span{color:var(--gold)}.money{background:#15192a;border:1px solid var(--line);padding:9px 12px;border-radius:13px;font-weight:800}.money b{color:var(--gold)}.hero{background:linear-gradient(135deg,#171b2b,#0f111b);border:1px solid var(--line);border-radius:24px;padding:22px;margin-bottom:16px}.hero h1{font-size:clamp(28px,7vw,48px);margin:0 0 7px}.hero p{color:var(--muted);margin:0 0 17px;max-width:700px}.actions{display:flex;flex-wrap:wrap;gap:9px}.btn{padding:12px 15px;border-radius:13px;background:#242a3d;color:white;font-weight:800}.btn.primary{background:var(--gold);color:#16120a}.btn.danger{background:#40202a}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}.section{margin:18px 0 9px;font-size:17px;font-weight:900}.panel{background:rgba(18,21,34,.92);border:1px solid var(--line);border-radius:19px;padding:15px}.pack{position:relative;overflow:hidden;min-height:185px}.pack .tag{position:absolute;right:12px;top:12px;color:#111;background:var(--gold);padding:5px 8px;border-radius:9px;font-size:11px;font-weight:900}.pack h3{margin:45px 0 4px;font-size:22px}.pack p{color:var(--muted);font-size:13px}.pack button{margin-top:10px}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:11px}.card{background:linear-gradient(150deg,#20253a,#121521);border:1px solid var(--line);border-radius:17px;padding:12px;min-height:205px;position:relative}.art{height:100px;border-radius:13px;background:#0d0f17;display:grid;place-items:center;font-size:54px;margin-bottom:10px}.rarity{font-size:10px;text-transform:uppercase;font-weight:900;letter-spacing:.7px}.card h4{margin:4px 0;font-size:17px}.odds{font-size:12px;color:var(--muted)}.price{margin-top:8px;color:var(--gold);font-weight:900}.row{display:flex;justify-content:space-between;gap:8px;align-items:center}.small{font-size:12px;color:var(--muted)}.trade{border:1px dashed #454c65;background:#111420;border-radius:15px;padding:13px;margin-top:10px}.trade input{width:100%;background:#0b0d14;border:1px solid var(--line);color:white;padding:10px;border-radius:10px;margin:8px 0}.feed{display:grid;gap:8px}.event{padding:12px;border-left:3px solid var(--gold);background:#111421;border-radius:9px;color:#dce0eb}.nav{position:fixed;bottom:0;left:0;right:0;background:rgba(10,11,17,.94);backdrop-filter:blur(14px);border-top:1px solid var(--line);z-index:5}.navin{max-width:850px;margin:auto;display:grid;grid-template-columns:repeat(6,1fr)}.nav button{background:none;color:var(--muted);padding:10px 4px;font-size:11px}.nav button.active{color:var(--gold);font-weight:900}.nav i{display:block;font-style:normal;font-size:18px;margin-bottom:3px}.page{display:none}.page.active{display:block}.toast{position:fixed;top:15px;left:50%;transform:translateX(-50%);background:#fff;color:#111;padding:11px 15px;border-radius:12px;font-weight:800;z-index:10;box-shadow:0 10px 35px #0008}.battle{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center}.fighter{text-align:center}.fighter .art{height:125px}.vs{font-weight:1000;font-size:22px;color:var(--red)}.bar{height:9px;background:#292e40;border-radius:9px;overflow:hidden}.bar span{display:block;height:100%;background:var(--green);width:100%}.modal{position:fixed;inset:0;background:#05060bcc;display:none;place-items:center;padding:18px;z-index:8}.modal.show{display:grid}.modalbox{width:min(520px,100%);background:#121522;border:1px solid var(--line);border-radius:24px;padding:18px;text-align:center}.modalbox .big{font-size:92px;margin:15px}.rar-common{color:#b8c0d0}.rar-uncommon{color:#69e89c}.rar-rare{color:#66a6ff}.rar-epic{color:#bb78ff}.rar-legendary{color:#ffd34d}.rar-mythic{color:#ff6aa7}.rar-secret{color:#ff7c59}.rar-og{color:#fff}.muted{color:var(--muted)}
+@media(max-width:500px){.app{padding-top:12px}.hero{padding:18px}.cards{grid-template-columns:repeat(2,1fr)}.battle{grid-template-columns:1fr}.vs{display:none}}
+</style>
+</head>
+<body>
+<div id="toast"></div>
+<div class="app">
+<header class="top"><div class="brand">Akk<span>Cards</span></div><div class="money">💰 <b id="money">20,000</b></div></header>
+
+<main id="home" class="page active">
+<section class="hero"><h1>Collect. Trade. Battle.</h1><p>AkkCards is a live collectible card game. Packs are only the beginning — build a collection, sell cards, make trade offers, battle players, and follow every new season.</p><div class="actions"><button class="btn primary" data-go="packs">Open Packs</button><button class="btn" data-go="battle">Battle</button><button class="btn" data-go="market">Trade Market</button></div></section>
+<div class="section">Live world</div><section class="grid"><div class="panel"><b>🟢 Servers</b><p class="muted">WebSocket-ready multiplayer architecture</p><b id="online">1,284 players online</b></div><div class="panel"><b>🏆 Season 1</b><p class="muted">Akk Origins is live</p><b>42 days remaining</b></div><div class="panel"><b>⚡ Event</b><p class="muted">OG Weekend — boosted OG drops</p><b>Active now</b></div></section>
+<div class="section">Recent activity</div><section class="feed" id="feed"></section>
+</main>
+
+<main id="packs" class="page"><div class="section">Pack Market</div><div class="grid" id="packsGrid"></div></main>
+
+<main id="cards" class="page"><div class="section">Card Index</div><div class="panel"><p class="muted">Every card has a rarity and an “1 in X” chance. No abilities or fake combat stats — the card itself is the flex.</p></div><div class="cards" id="cardIndex"></div></main>
+
+<main id="inventory" class="page"><div class="section">Your Collection</div><div class="panel row"><div><b id="count">0 cards</b><div class="small">duplicates included</div></div><button class="btn danger" id="sellAll">Sell duplicates</button></div><div class="cards" id="inventoryGrid"></div></main>
+
+<main id="market" class="page"><div class="section">Trade Line</div><div class="panel"><b>Post a card for offers</b><p class="small">Other players can send an offer. The owner decides whether to accept or decline.</p><div class="trade"><select id="tradeCard" style="width:100%;padding:10px;border-radius:10px;background:#0b0d14;color:white;border:1px solid var(--line)"></select><input id="tradeOffer" placeholder="What do you want? e.g. 1 Mythic + 50,000"><button class="btn primary" id="postTrade">Put on trade line</button></div></div><div class="section">Active listings</div><div class="feed" id="trades"></div></main>
+
+<main id="battle" class="page"><div class="section">Battle Arena</div><div class="panel"><p class="muted">Choose one of your cards. Battles are card-vs-card — rarity decides the baseline, with a little randomness. Multiplayer transport can plug into the same match flow.</p><div class="cards" id="battleChoices"></div></div><div class="section">Current match</div><div class="panel"><div class="battle"><div class="fighter"><div class="art" id="myArt">❓</div><b id="myName">Choose a card</b></div><div class="vs">VS</div><div class="fighter"><div class="art" id="enemyArt">🤖</div><b id="enemyName">Searching...</b></div></div><div style="margin-top:14px"><button class="btn primary" id="findBattle">Find Battle</button></div><p id="battleLog" class="small"></p></div></main>
+
+<main id="updates" class="page"><div class="section">Updates & Seasons</div><div class="grid"><div class="panel"><b>v1.4 — Battle Pass: OG Origins</b><p class="muted">New OG cards, trade-line improvements, battle matchmaking and 12 pass rewards.</p></div><div class="panel"><b>v1.3 — Inner La Birds</b><p class="muted">MYTHIC card added. New event and battle arena.</p></div><div class="panel"><b>v1.2 — Trade Line</b><p class="muted">Players can post cards and wait for another player to respond.</p></div></div></main>
+</div>
+
+<nav class="nav"><div class="navin">
+<button class="active" data-go="home"><i>🏠</i>Home</button><button data-go="packs"><i>🎁</i>Packs</button><button data-go="inventory"><i>🎒</i>Collection</button><button data-go="market"><i>🤝</i>Trade</button><button data-go="battle"><i>⚔️</i>Battle</button><button data-go="updates"><i>📰</i>Updates</button>
+</div></nav>
+<div class="modal" id="modal"><div class="modalbox"><div class="small" id="modalRarity"></div><div class="big" id="modalArt">🃏</div><h2 id="modalName">Card</h2><p id="modalOdds" class="muted"></p><button class="btn primary" id="modalClose">Keep Card</button></div></div>
+
+<script>
+const cards=[
+{name:"Noob",emoji:"🧍",rarity:"OG",odds:1000000,price:10000,sell:7500},
+{name:"Akkas",emoji:"🥨",rarity:"Legendary",odds:5000,price:8500,sell:7500},
+{name:"Inner La Birds",emoji:"🐦",rarity:"Mythic",odds:10000,price:25000,sell:18000},
+{name:"Chezburger",emoji:"🍔",rarity:"OG",odds:100000,price:20000,sell:15000},
+{name:"Troll",emoji:"😈",rarity:"Rare",odds:250,price:900,sell:500},
+{name:"Cool Dude",emoji:"😎",rarity:"Epic",odds:1000,price:2500,sell:1600},
+{name:"Banana",emoji:"🍌",rarity:"Common",odds:3,price:100,sell:60},
+{name:"Doge",emoji:"🐶",rarity:"Uncommon",odds:25,price:300,sell:180}
+];
+const rarityRank={Common:1,Uncommon:2,Rare:3,Epic:4,Legendary:5,Mythic:6,Secret:7,OG:8};
+const packs=[{name:"Legendary Pack",cost:10000,min:5},{name:"Mythic Hunt",cost:25000,min:6},{name:"OG Vault",cost:50000,min:8}];
+let state=JSON.parse(localStorage.getItem("akkcards")||"null")||{money:20000,inv:[],trades:[],wins:0};
+function save(){localStorage.setItem("akkcards",JSON.stringify(state));render()}
+function money(){return state.money.toLocaleString()}
+function toast(s){const t=document.getElementById("toast");t.textContent=s;t.className="toast";setTimeout(()=>t.className="",1800)}
+function go(id){document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));document.getElementById(id).classList.add("active");document.querySelectorAll(".nav button").forEach(x=>x.classList.toggle("active",x.dataset.go===id));render()}
+document.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>go(b.dataset.go)));
+function fmt(n){return "1 in "+n.toLocaleString()}
+function cardHtml(c,i,actions=""){return '<article class="card"><div class="art">'+c.emoji+'</div><div class="rarity rar-'+c.rarity.toLowerCase()+'">'+c.rarity+'</div><h4>'+c.name+'</h4><div class="odds">'+fmt(c.odds)+'</div><div class="price">💰 '+c.price.toLocaleString()+'</div>'+actions+'</article>'}
+function render(){
+document.getElementById("money").textContent=money();
+document.getElementById("count").textContent=state.inv.length+" cards";
+document.getElementById("cardIndex").innerHTML=cards.map(c=>cardHtml(c)).join("");
+document.getElementById("packsGrid").innerHTML=packs.map((p,i)=>'<div class="panel pack"><span class="tag">PACK</span><h3>'+p.name+'</h3><p>Guaranteed '+cards.filter(c=>rarityRank[c.rarity]>=p.min).length+' high-tier options in the pool.</p><button class="btn primary" data-pack="'+i+'">Open · 💰 '+p.cost.toLocaleString()+'</button></div>').join("");
+document.querySelectorAll("[data-pack]").forEach(b=>b.onclick=()=>openPack(+b.dataset.pack));
+document.getElementById("inventoryGrid").innerHTML=state.inv.length?state.inv.map((c,i)=>cardHtml(c,i,'<button class="btn" style="margin-top:9px;width:100%" data-sell="'+i+'">Sell · '+c.sell.toLocaleString()+'</button>')).join(""):'<div class="panel"><b>Your collection is empty.</b><p class="muted">Open a pack to start.</p></div>';
+document.querySelectorAll("[data-sell]").forEach(b=>b.onclick=()=>{const c=state.inv[+b.dataset.sell];state.money+=c.sell;state.inv.splice(+b.dataset.sell,1);save();toast("Sold "+c.name+" for 💰"+c.sell.toLocaleString())});
+document.getElementById("tradeCard").innerHTML=state.inv.map((c,i)=>'<option value="'+i+'">'+c.name+' · '+c.rarity+'</option>').join("");
+document.getElementById("trades").innerHTML=state.trades.length?state.trades.map((t,i)=>'<div class="event"><div class="row"><b>'+t.card.name+'</b><span class="rarity rar-'+t.card.rarity.toLowerCase()+'">'+t.card.rarity+'</span></div><div class="small">Seller: '+t.owner+'</div><div style="margin:7px 0">'+t.want+'</div><button class="btn" data-offer="'+i+'">Make offer</button></div>').join(""):'<div class="panel muted">No trade listings yet.</div>';
+document.querySelectorAll("[data-offer]").forEach(b=>b.onclick=()=>toast("Offer sent — waiting for the owner to respond."));
+document.getElementById("battleChoices").innerHTML=state.inv.slice(0,8).map((c,i)=>'<button class="card" data-fight="'+i+'" style="text-align:left">'+cardHtml(c).replace("<article class="card">","").replace("</article>","")+'</button>').join("");
+document.querySelectorAll("[data-fight]").forEach(b=>b.onclick=()=>{const c=state.inv[+b.dataset.fight];document.getElementById("myArt").textContent=c.emoji;document.getElementById("myName").textContent=c.name});
+document.getElementById("feed").innerHTML='<div class="event">⚔️ A player just found a MYTHIC Inner La Birds.</div><div class="event">🤝 Noob is waiting on the Trade Line.</div><div class="event">🔥 OG Weekend is active.</div>';
+}
+function openPack(pi){
+const p=packs[pi];if(state.money<p.cost){toast("Not enough money.");return}state.money-=p.cost;
+let pool=cards.filter(c=>rarityRank[c.rarity]>=p.min);if(!pool.length)pool=cards;
+let roll=Math.random();let c;
+if(roll<.00001)c=cards.find(x=>x.name==="Noob");
+else if(roll<.001)c=cards.find(x=>x.rarity==="Mythic")||pool[0];
+else if(roll<.02)c=cards.find(x=>x.rarity==="Legendary")||pool[0];
+else c=pool[Math.floor(Math.random()*pool.length)];
+state.inv.push(c);save();
+document.getElementById("modalRarity").textContent=c.rarity;document.getElementById("modalRarity").className="rarity rar-"+c.rarity.toLowerCase();
+document.getElementById("modalArt").textContent=c.emoji;document.getElementById("modalName").textContent=c.name;document.getElementById("modalOdds").textContent=fmt(c.odds)+" · Sell for 💰"+c.sell.toLocaleString();
+document.getElementById("modal").classList.add("show");
+}
+document.getElementById("modalClose").onclick=()=>document.getElementById("modal").classList.remove("show");
+document.getElementById("sellAll").onclick=()=>{if(!state.inv.length)return;let total=state.inv.reduce((a,c)=>a+c.sell,0);state.money+=total;state.inv=[];save();toast("Collection sold for 💰"+total.toLocaleString())};
+document.getElementById("postTrade").onclick=()=>{if(!state.inv.length){toast("You need a card first.");return}const i=+document.getElementById("tradeCard").value;const c=state.inv[i];const want=document.getElementById("tradeOffer").value.trim()||"Open to offers";state.trades.push({card:c,owner:"You",want});toast(c.name+" is now on the Trade Line");document.getElementById("tradeOffer").value="";save()};
+document.getElementById("findBattle").onclick=()=>{
+if(!state.inv.length){toast("Get a card before battling.");return}
+const c=state.inv[Math.floor(Math.random()*state.inv.length)], enemy=cards[Math.floor(Math.random()*cards.length)];
+document.getElementById("enemyArt").textContent=enemy.emoji;document.getElementById("enemyName").textContent=enemy.name;
+const my=rarityRank[c.rarity]+Math.random(), opp=rarityRank[enemy.rarity]+Math.random();
+setTimeout(()=>{if(my>=opp){state.wins++;state.money+=2500;document.getElementById("battleLog").textContent="YOU WIN! +💰2,500 · Win #"+state.wins}else{document.getElementById("battleLog").textContent="You lost this match. Your card stays in your collection."}save()},500);
+};
+render();
+</script>
+</body>
+</html>
