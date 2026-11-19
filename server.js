@@ -9,7 +9,7 @@ const server = http.createServer((req,res)=>{
     res.writeHead(200, {"Content-Type":"application/json","Cache-Control":"no-store"});
     return res.end(JSON.stringify({ok:true,service:"AkkCards",websocket:true,players:wss.clients.size}));
   }
-  if (req.url === "/" || req.url.startsWith("/index.html")) {
+  if (req.url === "/thalaga-funk" || req.url.startsWith("/thalaga-funk?") || req.url === "/thalaga-funk/") {\n    try {\n      const html = fs.readFileSync(path.join(__dirname,"thalaga-funk.html"),"utf8");\n      res.writeHead(200, {"Content-Type":"text/html; charset=utf-8","Cache-Control":"no-store"});\n      return res.end(html);\n    } catch (err) {\n      res.writeHead(500, {"Content-Type":"text/plain"});\n      return res.end("Thalaga Funk page unavailable");\n    }\n  }\n  if (req.url === "/" || req.url.startsWith("/index.html")) {
     try {
       const html = fs.readFileSync(path.join(__dirname,"index.html"),"utf8");
       res.writeHead(200, {"Content-Type":"text/html; charset=utf-8","Cache-Control":"no-store"});
